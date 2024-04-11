@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const todo_route_1 = __importDefault(require("./routes/todo.route"));
 const PORT = 3000;
 const app = (0, express_1.default)();
+app.use(express_1.default.json());
 app.use('/todos', todo_route_1.default);
 app.listen(PORT, () => {
     console.log('Running on port', PORT);

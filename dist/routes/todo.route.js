@@ -28,10 +28,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 /* eslint-disable @typescript-eslint/no-unused-vars */
 const express_1 = __importDefault(require("express"));
-// import { getAll } from '../controllers/todos.controller'
-const TodoContreller = __importStar(require("../controllers/todo.controller"));
+const TodoController = __importStar(require("../controllers/todo.controller"));
 const route = express_1.default.Router();
-route.get('/', TodoContreller.getAll);
-route.post('/', TodoContreller.post);
+route.get('/', TodoController.getAll);
+route.post('/', TodoController.post);
 exports.default = route;
 //# sourceMappingURL=todo.route.js.map
