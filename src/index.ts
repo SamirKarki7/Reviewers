@@ -1,19 +1,23 @@
-import express from 'express'
-import todoRouter from './routes/todo.route'
+import express from "express"
+// import todoRouter from './routes/todos.routes'
 import userRouter from './routes/user.route'
-import { genericErrorHandler } from './middlewares/errors.middlewares'
-import cors from 'cors'
-const PORT = 3003
-const app = express()
+import restroRouter from './routes/restaurant.route'
+// import contactRouter from './routes/contact.route'
+// import reviewsRouter from './routes/review.route'
+import * as errorsMiddlewares from "./middlewares/errors.middlewares";
+import cors from "cors";
+const PORT = 1111;
+const app = express() 
 app.use(express.json())
 app.use(cors())
-app.use('/todos' , todoRouter)
+app.use('/restros', restroRouter)
 app.use('/users', userRouter)
-app.listen(PORT, () => {
-    console.log('Running on port', PORT)
-    app.use(genericErrorHandler)
-})
+// app.use('/contacts',contactRouter)
+// app.use('/reviews',reviewsRouter)
+
+app.listen(PORT, ()=>{
+    console.log('Runnig on port',PORT)
+});
+app.use(errorsMiddlewares.genericErrorHandler)
+
 export default app;
-
-
-

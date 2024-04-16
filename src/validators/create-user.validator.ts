@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { z } from 'zod'
-import { isAdmin } from '../middlewares/authentication'
+// import { is_admin } from '../middlewares/authentication'
 export const createUserDtoBody = z.object({
-    
+    name: z.string({
+        required_error: 'name is required'
+    }),
     email: z
         .string({
             required_error: 'email is required',
@@ -11,7 +13,7 @@ export const createUserDtoBody = z.object({
     password: z.string({
         required_error: 'password is required',
     }),
-    isAdmin: z.boolean().optional().default(false)
+    is_admin: z.boolean().optional().default(false)
 })
 
 export const createUserDto = z.object({

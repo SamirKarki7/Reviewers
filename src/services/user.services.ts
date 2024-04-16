@@ -1,22 +1,40 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import bcrypt from 'bcrypt'
-import  Boom  from "@hapi/boom";
-import * as jwt from 'jsonwebtoken'
-import { z } from "zod";
-import { createUserDtoBody } from "../validators/create-user.validator";
+import Boom from "@hapi/boom";
+import  bcrypt from "bcrypt";
+import * as jwt from 'jsonwebtoken';
+import { any, z } from "zod";
+import { createUserDto, createUserDtoBody } from "../validators/create-user.validator";
 const prisma = new PrismaClient();
-export const createUser = async(user: z.infer<typeof createUserDtoBody>) => {
-    const {email,password,isAdmin} = user
+
+
+
+
+export const createUser = async(user: z.infer<typeof createUserDtoBody>)=>{
+const{name,email, password, is_admin} = user
+    try{
     return await prisma.user.create({
-        data: {
+        data:{
             email,
+            name,
             password: await bcrypt.hash(password, 10),
-            isAdmin,
-        },
+            is_admin,
+            
+        }
     })
 
+}catch(err:any){
+    console.log(err)
+    if(err.code==='P2002'){
+        throw Boom.conflict('Email tei vayo change han na bhai')
+    }else{
+        throw(err)
+    }
 }
+}
+
+
 export async function login(email: string, password: string) {
+   try{
     const user = await prisma.user.findFirstOrThrow({ where: { email } })
 
     // Compare the provided password with the stored hashed password
@@ -25,21 +43,37 @@ export async function login(email: string, password: string) {
     if (!passwordMatch) {
         // Password does not match
         // If you want to throw a http error, you can. This is throw internal server error
-        Boom.conflict('Password galat vayeko xa hai')
+      throw  Boom.conflict('Password not correct')
     }
 
     // Generate a token
-    const token = jwt.sign(
-        { userId: user.id, isAdmin: user.isAdmin },
-        'random-secret',
+    const accessToken = jwt.sign(
+        { user_id: user.id, is_admin: user.is_admin },
+        process.env.ACCESS_TOKEN_KEY as string,
         {
-            expiresIn: '1h',
+            expiresIn: '1d',
+        }
+    )
+
+     // Generate a token
+     const refressToken = jwt.sign(
+        { user_id: user.id, is_admin: user.is_admin },
+       process.env.REFRESH_TOKEN_KEY as string,
+        {
+            expiresIn: '7d',
         }
     )
 
     // Return the token to the client
-    return { success: true, token }
+    return { success: true, accessToken,refressToken }
+   }catch(err){
+    console.log(err)
+    throw err
+   }
 }
+// return the access token 
+
+
 export const remove = async (userId: any) =>{
     try{
         return  await prisma.user.delete({where: {id:userId}})
@@ -55,3 +89,22 @@ export const remove = async (userId: any) =>{
 }
 }
 }
+export async function refresh(userId: number) {
+    const user = await prisma.user.findFirstOrThrow({ where: { id: userId } })
+
+
+    // Generate a token
+    const accessToken = jwt.sign(
+        { user_id: user.id, isAdmin: user.is_admin },
+        process.env.ACCESS_TOKEN_KEY as string,
+        {
+            expiresIn: '1d',
+        }
+    )
+
+
+    // Return the accessToken to the client
+    return { success: true, accessToken }
+}
+// Refresh token - long lived token
+// Access token - short lived token expires in 5 minutes
