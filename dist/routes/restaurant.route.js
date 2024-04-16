@@ -26,25 +26,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const express_1 = __importDefault(require("express"));
-// import todoRouter from './routes/todos.routes'
-const user_route_1 = __importDefault(require("./routes/user.route"));
-const restaurant_route_1 = __importDefault(require("./routes/restaurant.route"));
-// import contactRouter from './routes/contact.route'
-// import reviewsRouter from './routes/review.route'
-const errorsMiddlewares = __importStar(require("./middlewares/errors.middlewares"));
-const cors_1 = __importDefault(require("cors"));
-const PORT = 1111;
-const app = (0, express_1.default)();
-app.use(express_1.default.json());
-app.use((0, cors_1.default)());
-app.use('/restros', restaurant_route_1.default);
-app.use('/users', user_route_1.default);
-// app.use('/contacts',contactRouter)
-// app.use('/reviews',reviewsRouter)
-app.listen(PORT, () => {
-    console.log('Runnig on port', PORT);
-});
-app.use(errorsMiddlewares.genericErrorHandler);
-exports.default = app;
-//# sourceMappingURL=index.js.map
+const RestroController = __importStar(require("../controllers/restaurant.controller"));
+const validate_1 = require("../utils/validate");
+const create_restaurant_validators_1 = require("../validators/create-restaurant-validators");
+const authentication_1 = require("../middlewares/authentication");
+const route = express_1.default.Router();
+route.get('/', RestroController.getAll);
+route.post('/', (0, validate_1.validate)(create_restaurant_validators_1.createRestro), authentication_1.authenticateToken, authentication_1.is_admin, RestroController.postRestro);
+route.patch('/:id', (0, validate_1.validate)(create_restaurant_validators_1.updateRestroDto), authentication_1.authenticateToken, authentication_1.is_admin, RestroController.update);
+route.delete('/:id', authentication_1.authenticateToken, authentication_1.is_admin, RestroController.remove);
+route.get('/:id', authentication_1.authenticateToken, RestroController.Get);
+exports.default = route;
+//# sourceMappingURL=restaurant.route.js.map

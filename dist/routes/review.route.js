@@ -27,24 +27,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-// import todoRouter from './routes/todos.routes'
-const user_route_1 = __importDefault(require("./routes/user.route"));
-const restaurant_route_1 = __importDefault(require("./routes/restaurant.route"));
-// import contactRouter from './routes/contact.route'
-// import reviewsRouter from './routes/review.route'
-const errorsMiddlewares = __importStar(require("./middlewares/errors.middlewares"));
-const cors_1 = __importDefault(require("cors"));
-const PORT = 1111;
-const app = (0, express_1.default)();
-app.use(express_1.default.json());
-app.use((0, cors_1.default)());
-app.use('/restros', restaurant_route_1.default);
-app.use('/users', user_route_1.default);
-// app.use('/contacts',contactRouter)
-// app.use('/reviews',reviewsRouter)
-app.listen(PORT, () => {
-    console.log('Runnig on port', PORT);
-});
-app.use(errorsMiddlewares.genericErrorHandler);
-exports.default = app;
-//# sourceMappingURL=index.js.map
+const ReviewController = __importStar(require("../controllers/review.controller"));
+const create_review_validator_1 = require("../validators/create-review.validator");
+const validate_1 = require("../utils/validate");
+const authentication_1 = require("../middlewares/authentication");
+const route = express_1.default.Router({ mergeParams: true });
+// route.get('/', UserController.getAll)
+// route.get('/:id', UserController.findOne)
+route.post('/', (0, validate_1.validate)(create_review_validator_1.createReviewDto), authentication_1.authenticateToken, ReviewController.createReview);
+route.delete('/', authentication_1.authenticateToken, ReviewController.remove);
+route.patch('/', (0, validate_1.validate)(create_review_validator_1.updateReviewDto), authentication_1.authenticateToken, ReviewController.update);
+exports.default = route;
+//# sourceMappingURL=review.route.js.map

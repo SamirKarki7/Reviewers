@@ -26,25 +26,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 const express_1 = __importDefault(require("express"));
-// import todoRouter from './routes/todos.routes'
-const user_route_1 = __importDefault(require("./routes/user.route"));
-const restaurant_route_1 = __importDefault(require("./routes/restaurant.route"));
-// import contactRouter from './routes/contact.route'
-// import reviewsRouter from './routes/review.route'
-const errorsMiddlewares = __importStar(require("./middlewares/errors.middlewares"));
-const cors_1 = __importDefault(require("cors"));
-const PORT = 1111;
-const app = (0, express_1.default)();
-app.use(express_1.default.json());
-app.use((0, cors_1.default)());
-app.use('/restros', restaurant_route_1.default);
-app.use('/users', user_route_1.default);
-// app.use('/contacts',contactRouter)
-// app.use('/reviews',reviewsRouter)
-app.listen(PORT, () => {
-    console.log('Runnig on port', PORT);
-});
-app.use(errorsMiddlewares.genericErrorHandler);
-exports.default = app;
-//# sourceMappingURL=index.js.map
+// import { getAll } from '../controllers/todo.controller'
+const ContactController = __importStar(require("../controllers/contact.controller"));
+const validate_1 = require("../utils/validate");
+const authentication_1 = require("../middlewares/authentication");
+const create_contact_validators_1 = require("../validators/create-contact-validators");
+const route = express_1.default.Router({ mergeParams: true });
+route.post('/', (0, validate_1.validate)(create_contact_validators_1.createContactDto), authentication_1.authenticateToken, authentication_1.is_admin, ContactController.createContact);
+route.delete('/', authentication_1.authenticateToken, authentication_1.is_admin, ContactController.remove);
+route.patch('/', (0, validate_1.validate)(create_contact_validators_1.updateContactDto), authentication_1.authenticateToken, authentication_1.is_admin, ContactController.update);
+exports.default = route;
+//# sourceMappingURL=contact.route.js.map
